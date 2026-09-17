@@ -1,0 +1,84 @@
+from __future__ import annotations
+
+from enum import Enum
+
+
+class BrowserStatus(str, Enum):
+    DISCONNECTED = "DISCONNECTED"
+    STARTING = "STARTING"
+    READY = "READY"
+    NAVIGATING = "NAVIGATING"
+    LOADED = "LOADED"
+    STOPPED = "STOPPED"
+    ERROR = "ERROR"
+
+
+class AgentStatus(str, Enum):
+    IDLE = "IDLE"
+    OBSERVING = "OBSERVING"
+    PLANNING = "PLANNING"
+    PROPOSING = "PROPOSING"
+    WAITING_FOR_AUTHORIZATION = "WAITING_FOR_AUTHORIZATION"
+    WAITING_FOR_APPROVAL = "WAITING_FOR_APPROVAL"
+    EXECUTING = "EXECUTING"
+    COMPLETED = "COMPLETED"
+    BLOCKED = "BLOCKED"
+    FAILED = "FAILED"
+    STOPPED = "STOPPED"
+    PAUSED = "PAUSED"
+
+
+class Verdict(str, Enum):
+    ALLOW = "ALLOW"
+    APPROVAL = "APPROVAL"
+    BLOCK = "BLOCK"
+
+
+class DataClass(str, Enum):
+    PUBLIC = "PUBLIC"
+    PERSONAL = "PERSONAL"
+    EMAIL = "EMAIL"
+    PII = "PII"
+    LOCATION = "LOCATION"
+    SENSITIVE = "SENSITIVE"
+    CREDENTIAL = "CREDENTIAL"
+    CARD = "CARD"
+    SECRET = "SECRET"
+    CANARY = "CANARY"
+
+
+class TrustLevel(str, Enum):
+    TRUSTED = "TRUSTED"
+    PARTIAL = "PARTIAL"
+    UNTRUSTED = "UNTRUSTED"
+
+
+class DestinationClass(str, Enum):
+    SAME_ORIGIN = "SAME_ORIGIN"
+    INTERNAL = "INTERNAL"
+    TRUSTED_VENDOR = "TRUSTED_VENDOR"
+    EXTERNAL = "EXTERNAL"
+    UNKNOWN = "UNKNOWN"
+
+
+class ThreatType(str, Enum):
+    INDIRECT_PROMPT_INJECTION = "INDIRECT_PROMPT_INJECTION"
+    SENSITIVE_DATA_FLOW = "SENSITIVE_DATA_FLOW"
+    UNTRUSTED_DESTINATION = "UNTRUSTED_DESTINATION"
+    UNAUTHORIZED_ACTION = "UNAUTHORIZED_ACTION"
+    INVALID_ACTION = "INVALID_ACTION"
+    DATA_LEAK_ATTEMPT = "DATA_LEAK_ATTEMPT"
+
+
+DATA_SENSITIVITY: dict[DataClass, int] = {
+    DataClass.PUBLIC: 0,
+    DataClass.PERSONAL: 1,
+    DataClass.EMAIL: 2,
+    DataClass.PII: 3,
+    DataClass.LOCATION: 3,
+    DataClass.SENSITIVE: 4,
+    DataClass.CREDENTIAL: 5,
+    DataClass.CARD: 6,
+    DataClass.SECRET: 7,
+    DataClass.CANARY: 8,
+}

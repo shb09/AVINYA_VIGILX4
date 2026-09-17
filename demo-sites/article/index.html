@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The quiet architecture of the modern web — Meridian</title>
+<link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="/">Meridian<span>·</span>Post</a>
+    <div class="masthead">Field article</div>
+    <nav class="nav">
+      <a href="#">Sections</a><a href="#">Opinion</a><a href="#">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <article>
+    <div class="article-head">
+      <div class="kicker">Frontier</div>
+      <h1 class="title">The quiet architecture of the modern web</h1>
+      <p class="dek">Pages, scripts and machine readers now share one surface. The interesting decisions are hiding in the seams between them.</p>
+      <div class="byline">
+        <span>By J. R. Halden</span> · <span>8 min read</span>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="prose">
+      <p class="lead">Twenty years ago a webpage was a document. Today it is closer to a surface that speaks back: it reads you, it reacts, it writes itself around you. The shift happened quietly, inside <code>fetch</code> calls and event listeners, but it changed who controls the experience.</p>
+
+      <section id="section-1">
+        <h2>One surface, many readers</h2>
+        <p>A single page now serves at least three audiences at once. A human reads it as prose. A script reads it as data. And increasingly, an agent reads it as an interface it can act on.</p>
+        <p>Each reader trusts the page differently. Humans have instincts about a layout. Scripts have contracts. Agents — if you build them carelessly — simply believe whatever the page tells them to do.</p>
+        <p class="pull">“Trust is not a property of a page. It is a property of a decision.”</p>
+      </section>
+
+      <section id="section-2" class="hidden-sec">
+        <h2>The difference between content and instruction</h2>
+        <p>Most pages contain both. An article contains content about the world; a button contains an instruction to do one thing. The trouble begins the moment a page mixes the two — when something that looks like content quietly asks the reader to act.</p>
+        <p>For a human this is an inconvenience, a dark pattern, a scam. For an autonomous agent it is a control channel: a way to steer an actor with more power than the page should ever have.</p>
+      </section>
+
+      <section id="section-3" class="hidden-sec">
+        <h2>Reading ahead</h2>
+        <p>In the final part of this piece we look at what changes when a machine, not a person, is the one who decides whether to act on a page's request — and why the boundary between “observe” and “execute” is the most heavily defended seam on the modern web.</p>
+        <p class="pull">The agent proposes. The boundary decides. The browser executes.</p>
+      </section>
+
+      <div style="margin-top:22px">
+        <button id="read-more" class="btn accent" data-sn="read-more" type="button">Read next section</button>
+      </div>
+    </div>
+  </article>
+</main>
+
+<footer class="footer">Meridian Post · Field article · Public content from a trusted origin</footer>
+
+<script>
+  const sections = ['#section-2', '#section-3'];
+  let idx = 0;
+  const btn = document.getElementById('read-more');
+  btn.addEventListener('click', () => {
+    if (idx < sections.length) {
+      document.querySelector(sections[idx]).classList.remove('hidden-sec');
+      idx += 1;
+    }
+    if (idx >= sections.length) {
+      btn.textContent = 'Article complete';
+      btn.setAttribute('aria-label', 'Article complete');
+      btn.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>

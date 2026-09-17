@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Playwright browsers (large binaries, installed locally)
+server/.browsers/
+
+# Server runtime artifacts
+server/data/
+*.db
+*.sqlite3
+
+# Node
+node_modules/
+dist/
+web/dist/
+
+# TS build artifacts (tsc -b composite emits alongside .ts)
+*.tsbuildinfo
+web/vite.config.js
+web/vite.config.d.ts
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
