@@ -5,7 +5,22 @@ from typing import Awaitable, Callable
 
 from pydantic import BaseModel, Field
 
-from ..models.actions import ActionProposal, ActionType
+from ..models.actions import (
+    ActionProposal,
+    ActionType,
+    ClickAction,
+    FillAction,
+    NavigateAction,
+    SubmitAction,
+    ExtractAction,
+    WaitAction,
+    SelectAction,
+    CheckAction,
+    UncheckAction,
+    ScrollAction,
+    PressAction,
+    BackAction,
+)
 
 
 class AuthorizationPurpose(str, Enum):
@@ -122,6 +137,24 @@ class Executor:
                 self._log("wait")
                 await page.wait_for_timeout(action.duration_ms)
                 res.note = f"Waited {action.duration_ms}ms."
+            elif action.action_type == ActionType.SELECT:
+                await self._select(page, proposal, action)
+                res.note = f"Selected {action.option or 'option'} on {label}."
+            elif action.action_type == ActionType.CHECK:
+                await self._check_uncheck(page, proposal, action, True)
+                res.note = f"Checked {label}."
+            elif action.action_type == ActionType.UNCHECK:
+                await self._check_uncheck(page, proposal, action, False)
+                res.note = f"Unchecked {label}."
+            elif action.action_type == ActionType.SCROLL:
+                await self._scroll(page, action)
+                res.note = f"Scrolled ({action.dx}, {action.dy})."
+            elif action.action_type == ActionType.PRESS:
+                await self._press(page, action)
+                res.note = f"Pressed key '{action.key}'."
+            elif action.action_type == ActionType.BACK:
+                await self._back(page)
+                res.note = "Navigated back."
             else:
                 return res.fail(ExecutionError.UNKNOWN, f"Unsupported action type {action.action_type}.")
         except Exception as exc:
@@ -134,11 +167,25 @@ class Executor:
             pass
         return res
 
-    def _locator(self, page, proposal, **_):
-        from playwright.async_api import async_playwright  # noqa: F401 (type stability)
+    async def _select(self, page, proposal, action):
+        el = self._locator(page, proposal)
+        await el.select_option(action.option)
 
-        selector = proposal.action.selector
-        return page.locator(selector).first
+    async def _check_uncheck(self, page, proposal, action, check):
+        el = self._locator(page, proposal)
+        if check:
+            await el.check()
+        else:
+            await el.uncheck()
+
+    async def _scroll(self, page, action):
+        await page.mouse.wheel(action.dx, action.dy)
+
+    async def _press(self, page, action):
+        await page.keyboard.press(action.key)
+
+    async def _back(self, page):
+        await page.go_back()
 
     def _classify(self, page, exc: Exception, action_name: str) -> ExecutionResult:
         msg = str(exc)

@@ -15,6 +15,12 @@ class ActionType(str, Enum):
     SUBMIT = "SUBMIT"
     EXTRACT = "EXTRACT"
     WAIT = "WAIT"
+    SELECT = "SELECT"
+    CHECK = "CHECK"
+    UNCHECK = "UNCHECK"
+    SCROLL = "SCROLL"
+    PRESS = "PRESS"
+    BACK = "BACK"
 
 
 class ActionBase(BaseModel):
@@ -99,6 +105,66 @@ class WaitAction(ActionBase):
         return ActionType.WAIT
 
 
+class SelectAction(ActionBase):
+    action_type: Literal["SELECT"]
+    selector: str
+    option: str = ""
+
+    @field_validator("action_type", mode="after")
+    @classmethod
+    def _normalize_select(cls, v: str | ActionType) -> ActionType:
+        return ActionType.SELECT
+
+
+class CheckAction(ActionBase):
+    action_type: Literal["CHECK"]
+    selector: str
+
+    @field_validator("action_type", mode="after")
+    @classmethod
+    def _normalize_check(cls, v: str | ActionType) -> ActionType:
+        return ActionType.CHECK
+
+
+class UncheckAction(ActionBase):
+    action_type: Literal["UNCHECK"]
+    selector: str
+
+    @field_validator("action_type", mode="after")
+    @classmethod
+    def _normalize_uncheck(cls, v: str | ActionType) -> ActionType:
+        return ActionType.UNCHECK
+
+
+class ScrollAction(ActionBase):
+    action_type: Literal["SCROLL"]
+    duration_ms: int = 400
+
+    @field_validator("action_type", mode="after")
+    @classmethod
+    def _normalize_scroll(cls, v: str | ActionType) -> ActionType:
+        return ActionType.SCROLL
+
+
+class PressAction(ActionBase):
+    action_type: Literal["PRESS"]
+    key: str
+
+    @field_validator("action_type", mode="after")
+    @classmethod
+    def _normalize_press(cls, v: str | ActionType) -> ActionType:
+        return ActionType.PRESS
+
+
+class BackAction(ActionBase):
+    action_type: Literal["BACK"]
+
+    @field_validator("action_type", mode="after")
+    @classmethod
+    def _normalize_back(cls, v: str | ActionType) -> ActionType:
+        return ActionType.BACK
+
+
 ActionPayload = Annotated[
     Union[
         ClickAction,
@@ -107,6 +173,12 @@ ActionPayload = Annotated[
         SubmitAction,
         ExtractAction,
         WaitAction,
+        SelectAction,
+        CheckAction,
+        UncheckAction,
+        ScrollAction,
+        PressAction,
+        BackAction,
     ],
     Field(discriminator="action_type"),
 ]

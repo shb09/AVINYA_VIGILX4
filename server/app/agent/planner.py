@@ -30,7 +30,7 @@ def validate_action_shape(proposal: Any) -> tuple[bool, list[str]]:
     if not isinstance(action.action_type, ActionType) or action.action_type.value not in {t.value for t in ActionType}:
         errors.append("Unknown action type.")
 
-    if action.action_type in (ActionType.CLICK, ActionType.FILL, ActionType.SUBMIT, ActionType.EXTRACT):
+    if action.action_type in (ActionType.CLICK, ActionType.FILL, ActionType.SUBMIT, ActionType.EXTRACT, ActionType.SELECT, ActionType.CHECK, ActionType.UNCHECK, ActionType.SCROLL, ActionType.PRESS, ActionType.BACK):
         selector = getattr(action, "selector", "")
         if not selector:
             errors.append("Missing selector.")
