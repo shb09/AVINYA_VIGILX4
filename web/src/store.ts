@@ -80,19 +80,23 @@ export const useSentinel = create<SentinelState>((set, get) => ({
   disposeSession: () => {
     socket?.close();
     socket = null;
-    set({ sessionId: null, snap: null, events: [], screenshot: null, wsStatus: "closed" });
+    set({ sessionId: null, snap: null, events: [], screenshot: null, wsStatus: "closed", lastError: null });
   },
 
   run: async (opts) => {
     const sid = get().sessionId;
-    if (!sid) return;
+    if (!sid) {
+      set({ lastError: "No active session. Please start a session first." });
+      return;
+    }
     set({ actionsBusy: true, lastError: null });
     try {
       await api.runAgent(sid, opts);
       socket?.requestState();
       await get().refresh();
     } catch (err) {
-      set({ lastError: err instanceof Error ? err.message : String(err) });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      set({ lastError: `Task execution failed: ${errorMessage}` });
     } finally {
       set({ actionsBusy: false });
     }
@@ -107,7 +111,8 @@ export const useSentinel = create<SentinelState>((set, get) => ({
       socket?.requestState();
       await get().refresh();
     } catch (err) {
-      set({ lastError: err instanceof Error ? err.message : String(err) });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      set({ lastError: `Failed to stop agent: ${errorMessage}` });
     } finally {
       set({ actionsBusy: false });
     }
@@ -115,14 +120,18 @@ export const useSentinel = create<SentinelState>((set, get) => ({
 
   reset: async () => {
     const sid = get().sessionId;
-    if (!sid) return;
+    if (!sid) {
+      set({ lastError: "No active session to reset." });
+      return;
+    }
     set({ actionsBusy: true, events: [], screenshot: null });
     try {
       await api.resetSession(sid);
       socket?.requestState();
       await get().refresh();
     } catch (err) {
-      set({ lastError: err instanceof Error ? err.message : String(err) });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      set({ lastError: `Failed to reset session: ${errorMessage}` });
     } finally {
       set({ actionsBusy: false });
     }
@@ -130,51 +139,83 @@ export const useSentinel = create<SentinelState>((set, get) => ({
 
   approve: async (actionId, decision) => {
     const sid = get().sessionId;
-    if (!sid) return;
+    if (!sid) {
+      set({ lastError: "No active session for approval." });
+      return;
+    }
     try {
       await api.approval(sid, actionId, decision);
       socket?.requestState();
       await get().refresh();
     } catch (err) {
-      set({ lastError: err instanceof Error ? err.message : String(err) });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      set({ lastError: `Approval failed: ${errorMessage}` });
     }
   },
 
   takeControl: async () => {
     const sid = get().sessionId;
-    if (!sid) return;
-    await api.control(sid, "take");
-    socket?.requestState();
-    await get().refresh();
+    if (!sid) {
+      set({ lastError: "No active session to take control." });
+      return;
+    }
+    try {
+      await api.control(sid, "take");
+      socket?.requestState();
+      await get().refresh();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      set({ lastError: `Failed to take control: ${errorMessage}` });
+    }
   },
 
   releaseControl: async () => {
     const sid = get().sessionId;
-    if (!sid) return;
-    await api.control(sid, "release");
-    socket?.requestState();
-    await get().refresh();
+    if (!sid) {
+      set({ lastError: "No active session to release control." });
+      return;
+    }
+    try {
+      await api.control(sid, "release");
+      socket?.requestState();
+      await get().refresh();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      set({ lastError: `Failed to release control: ${errorMessage}` });
+    }
   },
 
   navigate: async (url) => {
     const sid = get().sessionId;
-    if (!sid) return;
-    await api.navigate(sid, url);
-    socket?.requestState();
-    await get().refresh();
+    if (!sid) {
+      set({ lastError: "No active session to navigate." });
+      return;
+    }
+    try {
+      await api.navigate(sid, url);
+      socket?.requestState();
+      await get().refresh();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      set({ lastError: `Navigation failed: ${errorMessage}` });
+    }
   },
 
   input: (payload) => socket?.input(payload),
 
   refresh: async () => {
     const sid = get().sessionId;
-    if (!sid) return;
+    if (!sid) {
+      set({ lastError: "No active session to refresh." });
+      return;
+    }
     try {
       const snap = await api.session(sid);
       set({ snap });
       socket?.requestState();
     } catch (err) {
-      set({ lastError: err instanceof Error ? err.message : String(err) });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      set({ lastError: `Failed to refresh session: ${errorMessage}` });
     }
   },
 
