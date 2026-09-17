@@ -92,6 +92,47 @@ export default function DecisionPanel() {
         <span className="chip mono text-text-faint">{snap?.audit_count ?? 0} AUDITED</span>
         {active && <ShieldAlert className="ml-auto h-4 w-4 text-amber-bright pulse-drop" />}
       </div>
+
+      {/* Agent status with enhanced visual feedback */}
+      <div className="mt-3 flex items-center justify-between">
+        <span className="label">AGENT STATE</span>
+        <div className="flex items-center gap-2">
+          {snap && snap.agent.status !== "IDLE" && snap.agent.status !== "STOPPED" && snap.agent.status !== "COMPLETED" && snap.agent.status !== "BLOCKED" && snap.agent.status !== "FAILED" && snap.agent.status !== "PAUSED" && (
+            <span className={`h-2 w-2 rounded-full pulse-drop ${snap.agent.status === "WAITING_FOR_AUTHORIZATION" ? "bg-amber-bright" : snap.agent.status === "WAITING_FOR_APPROVAL" ? "bg-cyan" : snap.agent.status === "EXECUTING" ? "bg-mint" : snap.agent.status === "PLANNING" ? "bg-amber-bright" : snap.agent.status === "OBSERVING" ? "bg-cyan" : snap.agent.status === "PROPOSING" ? "bg-amber-bright" : "bg-text-faint"}`} />
+          )}
+          <span className="chip mono text-[10px] text-text-dim">{snap?.agent.status ?? "IDLE"}</span>
+        </div>
+      </div>
+
+      {/* Action lifecycle indicator */}
+      {snap?.current_action && (
+        <div className="mt-3 flex items-center gap-2 border-t border-[rgba(35,42,53,0.3)] pt-3">
+          <span className="label">ACTION</span>
+          <div className="flex items-center gap-2 ml-auto">
+            {snap.agent.status === "PROPOSING" && (
+              <span className="chip warn mono">ACTION PROPOSED</span>
+            )}
+            {snap.agent.status === "WAITING_FOR_AUTHORIZATION" && (
+              <span className="chip warn mono">WAITING FOR SENTINEL</span>
+            )}
+            {snap.agent.status === "WAITING_FOR_APPROVAL" && (
+              <span className="chip approval mono">WAITING FOR APPROVAL</span>
+            )}
+            {snap.agent.status === "EXECUTING" && (
+              <span className="chip allow mono">EXECUTING</span>
+            )}
+            {snap.agent.status === "COMPLETED" && (
+              <span className="chip allow mono">COMPLETED</span>
+            )}
+            {snap.agent.status === "BLOCKED" && (
+              <span className="chip block mono">BLOCKED</span>
+            )}
+            {snap.agent.status === "FAILED" && (
+              <span className="chip block mono">ERROR</span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

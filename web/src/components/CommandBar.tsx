@@ -19,6 +19,7 @@ export default function CommandBar() {
   const lastMessage = useSentinel((s) => s.lastMessage);
   const clearError = useSentinel((s) => s.clearError);
   const [task, setTask] = useState("");
+  const [showExamples, setShowExamples] = useState(false);
 
   const running = snap ? AGENT_ACTIVE[snap.agent.status] : false;
   const disabled = busy || running || !sessionId;
@@ -30,12 +31,27 @@ export default function CommandBar() {
     void run({ task: t });
   };
 
+  const exampleTasks = [
+    "Update my profile email",
+    "Navigate to the main article and read the second section",
+    "Find all forms on the page and fill them with test data",
+    "Click the login button",
+    "Extract all text from the page",
+    "Open the vendor site and click on the download button"
+  ];
+
   return (
     <div className="panel p-3.5">
       <div className="flex items-center gap-2">
         <TerminalSquare className="h-4 w-4 text-amber-bright" />
         <span className="label">COMMAND — SCENARIOS</span>
         {!sessionId && !busy && <span className="chip warn mono ml-auto">session required</span>}
+        <button
+          onClick={() => setShowExamples(!showExamples)}
+          className="mono text-[10px] text-text-faint hover:text-amber-bright transition-colors"
+        >
+          {showExamples ? "HIDE EXAMPLES" : "SHOW EXAMPLES"}
+        </button>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -51,6 +67,33 @@ export default function CommandBar() {
           </button>
         ))}
       </div>
+
+      <AnimatePresence>
+        {showExamples && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-3 overflow-hidden"
+          >
+            <div className="rounded-lg border border-[rgba(242,184,75,0.2)] bg-[rgba(242,184,75,0.05)] p-3">
+              <div className="mb-2 mono text-[10.5px] text-text-dim uppercase tracking-wide">EXAMPLE TASKS</div>
+              <div className="grid grid-cols-1 gap-1.5">
+                {exampleTasks.map((ex, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setTask(ex)}
+                    className="text-left text-[11.5px] hover:bg-[rgba(242,184,75,0.1)] p-2 rounded transition-colors text-text-dim hover:text-amber-bright"
+                  >
+                    <span className="text-amber-bright mr-2">▸</span>
+                    {ex}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="mt-3 flex gap-2">
         <div className="relative flex-1">
